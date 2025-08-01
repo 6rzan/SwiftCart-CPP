@@ -31,18 +31,13 @@ jobs:
       run: mvn -B package --file pom.xml
     
     # This step uploads the compiled JAR file as an artifact.
-    # Users can then download this artifact from the Actions page.
+    # The maven-assembly-plugin, configured in your pom.xml, creates a new JAR
+    # with the '-jar-with-dependencies' suffix. This is the file that will be uploaded.
     - name: Upload artifact
-      # Updated the action to use the non-deprecated version v4.
       uses: actions/upload-artifact@v4
       with:
         # The name of the artifact to be uploaded.
         name: ccp-assignment-jar
         # The path to the file to upload.
-        # This assumes your project is packaged into a JAR in the 'target' directory.
-        path: target/CCP-assignment-1.0-SNAPSHOT.jar
-
-    # The "Update dependency graph" step was removed because your pom.xml
-    # does not contain any dependencies, causing the action to fail.
-    # If you add dependencies to your pom.xml and want this feature,
-    # you can re-add this step.
+        # This will now target the correct file created by the assembly plugin.
+        path: target/CCP-assignment-1.0-SNAPSHOT-jar-with-dependencies.jar
