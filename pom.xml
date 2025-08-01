@@ -10,4 +10,21 @@
         <maven.compiler.release>24</maven.compiler.release>
         <exec.mainClass>com.swiftcart.ccp.assignment.CCPAssignment</exec.mainClass>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <!-- This plugin is what packages your code into a JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${exec.mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
