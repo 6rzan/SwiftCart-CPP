@@ -8,12 +8,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
+        <!-- Double-check this matches your main class's fully qualified name exactly -->
         <exec.mainClass>com.swiftcart.ccp.assignment.CCPAssignment</exec.mainClass>
     </properties>
     <build>
         <plugins>
             <plugin>
-                <!-- This plugin is what packages your code into a JAR -->
+                <!--
+                The maven-jar-plugin configures the Main-Class in the JAR's manifest.
+                This is required for 'java -jar' to know where to start.
+                -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
@@ -24,6 +28,34 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <!--
+                The maven-assembly-plugin creates a single "uber" or "fat" JAR
+                that includes all the necessary class files and dependencies.
+                This often fixes ClassNotFoundException issues.
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${exec.mainClass}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
