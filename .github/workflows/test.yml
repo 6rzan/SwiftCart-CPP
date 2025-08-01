@@ -29,10 +29,19 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    
+    # This step uploads the compiled JAR file as an artifact.
+    # Users can then download this artifact from the Actions page.
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        # The name of the artifact to be uploaded.
+        name: ccp-assignment-jar
+        # The path to the file to upload.
+        # This assumes your project is packaged into a JAR in the 'target' directory.
+        path: target/CCP-assignment-1.0-SNAPSHOT.jar
 
-
-
-
-
-
-      
+    # The "Update dependency graph" step was removed because your pom.xml
+    # does not contain any dependencies, causing the action to fail.
+    # If you add dependencies to your pom.xml and want this feature,
+    # you can re-add this step.
