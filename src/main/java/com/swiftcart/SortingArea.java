@@ -2,7 +2,9 @@
 package com.swiftcart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,32 +28,58 @@ public class SortingArea implements Runnable {
 
     @Override
     public void run() {
-        List<Order> batch = new ArrayList<>();
+        Map<String, List<Order>> regionalBatches = new HashMap<>();
+        List<List<Order>> readyBatches = new ArrayList<>();
+
         try {
             while (true) {
                 Order order = labellingQueue.take();
+
                 if (order == Order.POISON_PILL) {
-                    // Process any remaining orders in the batch before stopping
-                    if (!batch.isEmpty()) {
-                        Container container = new Container(new ArrayList<>(batch));
-                        System.out.println("SortingArea: Created final Container #" + container.getId() + " with " + batch.size() + " boxes. (Thread: " + Thread.currentThread().getName() + ")");
-                        sortingQueue.put(container);
-                        containersShipped.incrementAndGet();
+                    // Process remaining orders
+                    for (List<Order> batch : regionalBatches.values()) {
+                        if (!batch.isEmpty()) {
+                            readyBatches.add(new ArrayList<>(batch));
+                        }
                     }
-                    // Poison the next queue for each Loader thread
+                    if (!readyBatches.isEmpty()) {
+                        List<Order> finalBoxes = new ArrayList<>();
+                        for (List<Order> batch : readyBatches) {
+                            finalBoxes.addAll(batch);
+                        }
+                        if (!finalBoxes.isEmpty()) {
+                            Container container = new Container(finalBoxes);
+                            System.out.println("SortingArea: Created final Container #" + container.getId() + " with " + finalBoxes.size() + " boxes. (Thread: " + Thread.currentThread().getName() + ")");
+                            sortingQueue.put(container);
+                            containersShipped.incrementAndGet();
+                        }
+                    }
                     for (int i = 0; i < 3; i++) {
                         sortingQueue.put(Container.POISON_PILL);
                     }
                     break;
                 }
-                batch.add(order);
+
                 boxesPacked.incrementAndGet();
-                if (batch.size() == 30) {
-                    Container container = new Container(new ArrayList<>(batch));
-                    System.out.println("SortingArea: Created Container #" + container.getId() + " with 30 boxes. (Thread: " + Thread.currentThread().getName() + ")");
-                    sortingQueue.put(container);
-                    containersShipped.incrementAndGet();
+                regionalBatches.computeIfAbsent(order.getRegionalZone(), k -> new ArrayList<>()).add(order);
+
+                List<Order> batch = regionalBatches.get(order.getRegionalZone());
+                if (batch.size() == 6) {
+                    readyBatches.add(new ArrayList<>(batch));
+                    System.out.println("SortingArea: Batch of 6 for zone " + order.getRegionalZone() + " is ready. (Thread: " + Thread.currentThread().getName() + ")");
                     batch.clear();
+
+                    if (readyBatches.size() == 5) {
+                        List<Order> containerBoxes = new ArrayList<>();
+                        for (List<Order> readyBatch : readyBatches) {
+                            containerBoxes.addAll(readyBatch);
+                        }
+                        Container container = new Container(containerBoxes);
+                        System.out.println("SortingArea: Created Container #" + container.getId() + " with 30 boxes from 5 batches. (Thread: " + Thread.currentThread().getName() + ")");
+                        sortingQueue.put(container);
+                        containersShipped.incrementAndGet();
+                        readyBatches.clear();
+                    }
                 }
             }
         } catch (InterruptedException e) {
