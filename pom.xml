@@ -7,7 +7,9 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>24</maven.compiler.release>
+        <!-- The compiler release was downgraded to Java 11 to match your local JRE,
+        which caused the UnsupportedClassVersionError. -->
+        <maven.compiler.release>11</maven.compiler.release>
         <!-- Corrected the main class to match your actual main class -->
         <exec.mainClass>com.swiftcart.SwiftCartSimulation</exec.mainClass>
     </properties>
