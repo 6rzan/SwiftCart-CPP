@@ -8,8 +8,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
-        <!-- Double-check this matches your main class's fully qualified name exactly -->
-        <exec.mainClass>com.swiftcart.ccp.assignment.CCPAssignment</exec.mainClass>
+        <!-- Corrected the main class to match your actual main class -->
+        <exec.mainClass>com.swiftcart.SwiftCartSimulation</exec.mainClass>
     </properties>
     <build>
         <plugins>
