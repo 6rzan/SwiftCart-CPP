@@ -2,7 +2,7 @@
 
 This project is a Java-based simulation of an automated warehouse order fulfillment system called SwiftCart. It models the entire process from order intake to truck dispatch, using concurrent programming techniques to simulate a high-throughput environment.
 
-The whole project was made for and assignmen created by **DR. KUAN YIK JUNN** my lecturer at APU for Concurent Programing module
+The whole project was made for an assignmen created by **DR. KUAN YIK JUNN** my lecturer at APU for Concurent Programing module
 
 ## Simulation Overview
 
